@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'ht';
+  src: url('fonts/ht.ttf');
+}
+.search-text {
+  font-size: 20px;
+  color: #f00;
+  font-family: 'ht';
+}
