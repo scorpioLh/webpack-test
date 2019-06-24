@@ -1,6 +1,6 @@
 'use strict';
 
-const glob = require('glob')
+const glob = require('glob');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -36,12 +36,11 @@ const setMPA = () => {
             })
         );
     })
-    console.log('entryFiles', entryFiles);
 
     return {
         entry,
         htmlWebpackPlugins
-    }
+    };
 }
 
 const { entry, htmlWebpackPlugins } = setMPA();
@@ -52,7 +51,7 @@ module.exports = {
         path: path.join(__dirname, 'dist'),
         filename: '[name]_[chunkhash:8].js'
     },
-    mode: 'production',
+    mode: 'none',
     module: {
         rules: [
             {
@@ -124,5 +123,6 @@ module.exports = {
             cssProcessor: require('cssnano')
         }),
         new CleanWebpackPlugin()
-    ].concat(htmlWebpackPlugins)
+    ].concat(htmlWebpackPlugins),
+    devtool: 'inline-source-map'
 };
