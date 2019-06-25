@@ -4,7 +4,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import '../../common';
 import logo from './images/logo.png';
+import { a } from './tree-shaking'
 import './search.less';
+
+if (false) {
+    a()
+}
 
 class Search extends React.Component {
 
