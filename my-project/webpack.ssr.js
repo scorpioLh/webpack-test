@@ -50,7 +50,8 @@ module.exports = {
     entry,
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: '[name]_[chunkhash:8].js'
+        filename: '[name]-server.js',
+        libraryTarget: 'umd'
     },
     mode: 'production',
     // mode: 'none',

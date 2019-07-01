@@ -1,7 +1,6 @@
 'use strict';
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import '../../common';
 import logo from './images/logo.png';
 import './search.less';
@@ -17,13 +16,13 @@ class Search extends React.Component {
         }
     }
 
-    // loadComponent() {
-    //     import('./text').then((Text) => {
-    //         this.setState({
-    //             Text: Text.default
-    //         })
-    //     })
-    // }
+    loadComponent() {
+        import('./text').then((Text) => {
+            this.setState({
+                Text: Text.default
+            })
+        })
+    }
 
     render() {
         const { Text } = this.state;
@@ -33,12 +32,9 @@ class Search extends React.Component {
                 Text ? <Text /> : null
             }
             { addResult }
-            搜索文字的内容<img src={ logo } />
+            搜索文字的内容<img src={ logo } onClick={ this.loadComponent.bind(this) } />
         </div>;
     }
 }
 
-ReactDOM.render(
-    <Search />,
-    document.getElementById('root')
-);
+module.exports = Search
