@@ -26,19 +26,19 @@ class Search extends React.Component {
     // }
 
     render() {
-        const { Text } = this.state;
-        const addResult = largeNumber('999', '1')
-        return <div className="search-text">
-            {
-                Text ? <Text /> : null
-            }
-            { addResult }
-            搜索文字的内容<img src={ logo } />
-        </div>;
+        // const { Text } = this.state;
+        // const addResult = largeNumber('999', '1')
+        // return <div className="search-text">
+        //     {
+        //         Text ? <Text /> : null
+        //     }
+        //     { addResult }
+        //     搜索文字的内容<img src={ logo } />
+        // </div>;
     }
 }
 
 ReactDOM.render(
-    <Search />,
+    // <Search />,
     document.getElementById('root')
 );
