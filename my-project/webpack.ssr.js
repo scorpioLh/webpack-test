@@ -2,65 +2,71 @@
 
 const glob = require('glob');
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin');
+const FriendlyErrorsWebpackPlugin = require('friendly-errors-webpack-plugin');
 
 const setMPA = () => {
     const entry = {};
     const htmlWebpackPlugins = [];
+    const entryFiles = glob.sync(path.join(__dirname, './src/*/index-server.js'));
 
-    const entryFiles = glob.sync(path.join(__dirname, './src/*/index.js'))
+    Object.keys(entryFiles)
+        .map((index) => {
+            const entryFile = entryFiles[index];
+            // '/Users/cpselvis/my-project/src/index/index.js'
 
-    Object.keys(entryFiles).map(index => {
-        const entryFile = entryFiles[index];
-        const match = entryFile.match(/src\/(.*)\/index\.js/);
-        const pageName = match && match[1];
+            const match = entryFile.match(/src\/(.*)\/index-server\.js/);
+            const pageName = match && match[1];
 
-        entry[pageName] = entryFile;
-        htmlWebpackPlugins.push(
-            new HtmlWebpackPlugin({
-                template: path.join(__dirname, `src/${pageName}/index.html`),
-                filename: `${pageName}.html`,
-                chunks: ['vendors', 'common', pageName],
-                inject: true,
-                minify: {
-                    html5: true,
-                    collapseWhitespace: true,
-                    preserveLineBreaks: false,
-                    minifyCSS: true,
-                    minifyJS: true,
-                    removeComments: false
-                }
-            })
-        );
-    })
+            if (pageName) {
+                entry[pageName] = entryFile;
+                htmlWebpackPlugins.push(
+                    new HtmlWebpackPlugin({
+                        inlineSource: '.css$',
+                        template: path.join(__dirname, `src/${pageName}/index.html`),
+                        filename: `${pageName}.html`,
+                        chunks: ['vendors', pageName],
+                        inject: true,
+                        minify: {
+                            html5: true,
+                            collapseWhitespace: true,
+                            preserveLineBreaks: false,
+                            minifyCSS: true,
+                            minifyJS: true,
+                            removeComments: false
+                        }
+                    })
+                );
+            }
+        });
 
     return {
         entry,
         htmlWebpackPlugins
-    };
+    }
 }
 
 const { entry, htmlWebpackPlugins } = setMPA();
 
 module.exports = {
-    entry,
+    entry: entry,
     output: {
         path: path.join(__dirname, 'dist'),
         filename: '[name]-server.js',
         libraryTarget: 'umd'
     },
-    mode: 'production',
-    // mode: 'none',
+    mode: 'none',
     module: {
         rules: [
             {
                 test: /.js$/,
                 use: [
-                    'babel-loader'
+                    'babel-loader',
                     // 'eslint-loader'
                 ]
             },
@@ -81,8 +87,8 @@ module.exports = {
                         loader: 'postcss-loader',
                         options: {
                             plugins: () => [
-                                require('autoprefixer') ({
-                                    overrideBrowserslist: ['last 2 version', '>1%', 'ios 7']
+                                require('autoprefixer')({
+                                    browsers: ['last 2 version', '>1%', 'ios 7']
                                 })
                             ]
                         }
@@ -133,38 +139,38 @@ module.exports = {
         //     externals: [
         //       {
         //         module: 'react',
-        //         entry: 'https://cdn.bootcss.com/react/16.2.0/umd/react.production.min.js',
+        //         entry: 'https://11.url.cn/now/lib/16.2.0/react.min.js',
         //         global: 'React',
         //       },
         //       {
         //         module: 'react-dom',
-        //         entry: 'https://cdn.bootcss.com/react-dom/16.2.0/umd/react-dom.production.min.js',
+        //         entry: 'https://11.url.cn/now/lib/16.2.0/react-dom.min.js',
         //         global: 'ReactDOM',
-        //       }
+        //       },
         //     ]
-        // })
+        // }),
+        new FriendlyErrorsWebpackPlugin(),
+        function() {
+            this.hooks.done.tap('done', (stats) => {
+                if (stats.compilation.errors && stats.compilation.errors.length && process.argv.indexOf('--watch') == -1)
+                {
+                    console.log('build error');
+                    process.exit(1);
+                }
+            })
+        }
     ].concat(htmlWebpackPlugins),
     // optimization: {
     //     splitChunks: {
+    //         minSize: 0,
     //         cacheGroups: {
     //             commons: {
-    //                 test: /(react|react-dom)/,
-    //                 name: 'vendors',
-    //                 chunks: 'all'
+    //                 name: 'commons',
+    //                 chunks: 'all',
+    //                 minChunks: 2
     //             }
     //         }
     //     }
-    // },
-    optimization: {
-        splitChunks: {
-            minSize: 0,
-            cacheGroups: {
-                commons: {
-                    name: 'commons',
-                    chunks: 'all',
-                    minChunks: 2
-                }
-            }
-        }
-    }
+    // }
+    stats: 'errors-only'
 };
